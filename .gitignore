@@ -1,0 +1,28 @@
+# Folders
+node_modules/
+
+# Files
+*.log
+
+# IDEs configurations
+.idea/
+.vscode/
+.atom/
+
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Applications
+*.app
+*.exe
+*.war
+
+# Large media files
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
