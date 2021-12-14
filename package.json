@@ -1,0 +1,47 @@
+{
+    "name": "opencode-sdk",
+    "version": "0.0.1",
+    "description": "Opencode SDK to interact with Opencode API",
+    "license": "GPL-3.0-only",
+    "author": "rafael.andrade@netzee.com.br",
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@bitbucket.org/netzee-tray/opencode-sdk.git"
+    },
+    "keywords": [
+        "opencode",
+        "tray",
+        "cli"
+    ],
+    "main": "main.js",
+    "files": [
+        "dist/**/*"
+    ],
+    "scripts": {
+        "prepare": "husky install",
+        "commit": "cz",
+        "build": "tsc",
+        "watch": "tsc --watch"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^15.0.0",
+        "@commitlint/config-conventional": "^15.0.0",
+        "@commitlint/cz-commitlint": "^15.0.0",
+        "@types/node": "^16.11.12",
+        "@typescript-eslint/eslint-plugin": "^5.7.0",
+        "@typescript-eslint/parser": "^5.7.0",
+        "commitizen": "^4.2.4",
+        "eslint": "^8.4.1",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-import": "^2.25.3",
+        "husky": "^7.0.4",
+        "prettier": "^2.5.1",
+        "typescript": "^4.5.4"
+    },
+    "config": {
+        "commitizen": {
+            "path": "@commitlint/cz-commitlint"
+        }
+    }
+}
