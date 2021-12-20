@@ -1,12 +1,12 @@
 {
     "compilerOptions": {
-
         /* Basic Options */
         "target": "ES2016",
         "module": "commonjs",
         "declaration": true,
         "outDir": "dist",
         "rootDir": "src",
+        "declarationDir": "dist/types",
 
         /* Strict Type-Checking Options */
         "strict": true,
@@ -18,8 +18,7 @@
 
         /* Advanced Options */
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-
+        "forceConsistentCasingInFileNames": true
     },
     "watchOptions": {
         "watchFile": "useFsEvents",
@@ -29,7 +28,5 @@
         "excludeDirectories": ["**/node_modules", "_build"],
         "excludeFiles": []
     },
-    "include": [
-        "src/**/*"
-    ]
+    "include": ["src/**/*"]
 }

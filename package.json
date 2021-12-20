@@ -13,7 +13,7 @@
         "tray",
         "cli"
     ],
-    "main": "main.js",
+    "main": "dist/api.js",
     "files": [
         "dist/**/*"
     ],
@@ -30,6 +30,7 @@
         "@types/node": "^16.11.12",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
+        "axios": "^0.24.0",
         "commitizen": "^4.2.4",
         "eslint": "^8.4.1",
         "eslint-config-airbnb-base": "^15.0.0",
