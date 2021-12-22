@@ -1,6 +1,6 @@
-import { ApiError } from './ApiError';
+import ApiError from './ApiError';
 
-export class AuthenticationError extends ApiError {
+export default class AuthenticationError extends ApiError {
     constructor(details: string, data: object) {
         super({
             code: 'SDK::0001',

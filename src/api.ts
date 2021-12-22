@@ -1,9 +1,9 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
-import { FailedConfigurationError } from './errors/FailedConfigurationError';
-import { AuthenticationError } from './errors/AuthenticationError';
-import { ApiError } from './errors/ApiError';
-import { UnknownError } from './errors/UnknownError';
+import FailedConfigurationError from './errors/FailedConfigurationError';
+import AuthenticationError from './errors/AuthenticationError';
+import ApiError from './errors/ApiError';
+import UnknownError from './errors/UnknownError';
 
 type config = {
     key: string;
@@ -15,7 +15,7 @@ type config = {
 /**
  *
  */
-class Api {
+export default class Api {
     readonly version: string = '1.0.4';
     readonly url: string = 'https://opencode.tray.com.br/api';
     readonly debug: boolean;
@@ -82,5 +82,3 @@ class Api {
             });
     }
 }
-
-export { Api };
