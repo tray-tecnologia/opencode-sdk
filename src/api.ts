@@ -4,16 +4,17 @@ import FailedConfigurationError from './errors/FailedConfigurationError';
 import AuthenticationError from './errors/AuthenticationError';
 import ApiError from './errors/ApiError';
 import UnknownError from './errors/UnknownError';
+import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
 
 type config = {
     key: string;
     password: string;
     themeId: number | null;
-    debug: boolean;
+    debug?: boolean;
 };
 
 /**
- *
+ * Opencode api main class
  */
 export default class Api {
     readonly version: string = '1.0.4';
@@ -39,9 +40,21 @@ export default class Api {
         };
     }
 
+    verifyAuthenticationError(error: AxiosError): AuthenticationError | boolean {
+        if (error.response) {
+            const { data } = error.response;
+
+            if (data.message == 'Token de acesso inválido' && data.code == '00001' && data.status == 401) {
+                return new AuthenticationError(data.message, data);
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Check configurations files
-     * @returns Object with previewUrl in success case, or error message otherwise.
+     * @returns Promise to be resolved. ApiConfigurationResponse if resolved. ApiError otherwise.
      */
     checkConfiguration(): Promise<ApiConfigurationResponse | ApiError> {
         const config: AxiosRequestConfig = {
@@ -68,17 +81,43 @@ export default class Api {
             .catch((error: AxiosError) => {
                 let sdkError;
 
-                if (error.response && error.response.data) {
-                    if ('authentication' in error.response.data) {
+                sdkError = this.verifyAuthenticationError(error);
+
+                if (!sdkError) {
+                    if (error.response && 'authentication' in error.response.data) {
                         sdkError = new FailedConfigurationError(error.response.data);
-                    } else {
-                        sdkError = new AuthenticationError(error.response.data.message, error.response.data);
                     }
-                } else {
-                    sdkError = new UnknownError();
                 }
 
-                return Promise.reject(sdkError);
+                return Promise.reject(sdkError || new UnknownError());
+            });
+    }
+
+    /**
+     * Get a list of all themes available at store
+     * @returns Promise ApiListThemesResponse if promise resolves, or ApiError otherwise.
+     */
+    getThemes(): Promise<any> {
+        const config: AxiosRequestConfig = {
+            url: `${this.url}/list`,
+            method: 'get',
+            headers: this.headers,
+            params: {
+                gem_version: this.version,
+            },
+        };
+
+        return axios
+            .request<ApiListThemesResponse>(config)
+            .then((response) => {
+                return Promise.resolve(response.data);
+            })
+            .catch((error: AxiosError) => {
+                let sdkError;
+
+                sdkError = this.verifyAuthenticationError(error);
+
+                return Promise.reject(sdkError || new UnknownError());
             });
     }
 }
