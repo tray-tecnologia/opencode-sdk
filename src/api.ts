@@ -1,12 +1,13 @@
-import axios, { Axios, AxiosError, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
-import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
-import FailedConfigurationError from './errors/FailedConfigurationError';
-import AuthenticationError from './errors/AuthenticationError';
+import axios, { AxiosError, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
+
 import ApiError from './errors/ApiError';
-import UnknownError from './errors/UnknownError';
-import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
-import { ApiCreateThemeResponse } from './responses/ApiCreateThemeResponse';
+import AuthenticationError from './errors/AuthenticationError';
+import FailedConfigurationError from './errors/FailedConfigurationError';
 import InvalidOrNotSentParamsError from './errors/InvalidOrNotSentParamsError';
+import UnknownError from './errors/UnknownError';
+import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
+import { ApiCreateThemeResponse } from './responses/ApiCreateThemeResponse';
+import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
 
 type config = {
     key: string;
