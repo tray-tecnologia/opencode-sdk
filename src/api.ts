@@ -26,8 +26,7 @@ export default class Api {
     readonly headers: AxiosRequestHeaders;
 
     /**
-     * Initiate new API class instance
-     * @param param0
+     * Initiate API class instance
      */
     constructor({ key, password, themeId = null, debug = false }: config) {
         this.key = key;
@@ -40,7 +39,12 @@ export default class Api {
         };
     }
 
-    verifyAuthenticationError(error: AxiosError): AuthenticationError | boolean {
+    /**
+     * Verify response error to detect Authentication error from API
+     * @param {AxiosError} error Response error from Axios
+     * @return {AuthenticationError | boolean} Returns AuthenticationError instance in case of Authentication error, false otherwise.
+     */
+    private verifyAuthenticationError(error: AxiosError): AuthenticationError | boolean {
         if (error.response) {
             const { data } = error.response;
 
