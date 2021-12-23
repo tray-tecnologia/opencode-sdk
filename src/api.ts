@@ -5,6 +5,8 @@ import AuthenticationError from './errors/AuthenticationError';
 import ApiError from './errors/ApiError';
 import UnknownError from './errors/UnknownError';
 import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
+import { ApiCreateThemeResponse } from './responses/ApiCreateThemeResponse';
+import InvalidOrNotSentParamsError from './errors/InvalidOrNotSentParamsError';
 
 type config = {
     key: string;
@@ -101,7 +103,7 @@ export default class Api {
      * Get a list of all themes available at store
      * @returns Promise ApiListThemesResponse if promise resolves, or ApiError otherwise.
      */
-    getThemes(): Promise<any> {
+    getThemes(): Promise<ApiListThemesResponse | ApiError> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/list`,
             method: 'get',
@@ -120,6 +122,50 @@ export default class Api {
                 let sdkError;
 
                 sdkError = this.verifyAuthenticationError(error);
+
+                return Promise.reject(sdkError || new UnknownError());
+            });
+    }
+
+    /**
+     * Create a new theme on store.
+     * @param name Name of the new theme
+     * @param base Name of the base theme
+     * @returns Promise ApiCreateThemeResponse if promise resolves, or ApiError otherwise.
+     */
+    createTheme(name: string, base: string = 'default'): Promise<ApiCreateThemeResponse | ApiError> {
+        const config: AxiosRequestConfig = {
+            url: `${this.url}/themes`,
+            method: 'post',
+            headers: this.headers,
+            params: {
+                gem_version: this.version,
+            },
+            data: {
+                theme: {
+                    name,
+                    theme_base: base,
+                    gem_version: this.version,
+                },
+            },
+        };
+
+        return axios
+            .request(config)
+            .then((response) => {
+                const { theme_id: themeId, name, preview, published } = response.data;
+                const data: ApiCreateThemeResponse = { themeId, name, preview, published };
+
+                return Promise.resolve(data);
+            })
+            .catch((error: AxiosError) => {
+                let sdkError;
+
+                sdkError = this.verifyAuthenticationError(error);
+
+                if (!sdkError && error.response && error.response.data.code == '00101') {
+                    sdkError = new InvalidOrNotSentParamsError(error.response.data);
+                }
 
                 return Promise.reject(sdkError || new UnknownError());
             });
