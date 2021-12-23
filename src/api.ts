@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
+import axios, { Axios, AxiosError, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
 import FailedConfigurationError from './errors/FailedConfigurationError';
 import AuthenticationError from './errors/AuthenticationError';
@@ -165,6 +165,44 @@ export default class Api {
 
                 if (!sdkError && error.response && error.response.data.code == '00101') {
                     sdkError = new InvalidOrNotSentParamsError(error.response.data);
+                }
+
+                return Promise.reject(sdkError || new UnknownError());
+            });
+    }
+
+    /**
+     * Clean cache for a theme on store
+     * @param {number|null} themeId Theme id to clean cache.
+     * @returns Promise Return true with promises resolve, or ApiError otherwise.
+     */
+    cleanCache(themeId = this.themeId): Promise<boolean | ApiError> {
+        const config: AxiosRequestConfig = {
+            url: `${this.url}/clean_cache/`,
+            method: 'post',
+            headers: this.headers,
+            params: {
+                theme_id: themeId,
+                gem_version: this.version,
+            },
+        };
+
+        return axios
+            .request(config)
+            .then((response) => {
+                if (response.data.response.code === 200) {
+                    throw new UnknownError(`Unknown error. Details: ${response.data.response.message}`);
+                }
+
+                return Promise.resolve(true);
+            })
+            .catch((error: AxiosError | ApiError) => {
+                let sdkError;
+
+                if (error instanceof ApiError) {
+                    sdkError = error;
+                } else {
+                    sdkError = this.verifyAuthenticationError(error);
                 }
 
                 return Promise.reject(sdkError || new UnknownError());
