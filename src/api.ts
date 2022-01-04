@@ -3,6 +3,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosRequestHeaders } from 'axio
 import ApiError from './errors/ApiError';
 import AuthenticationError from './errors/AuthenticationError';
 import FailedConfigurationError from './errors/FailedConfigurationError';
+import InvalidLayoutError from './errors/InvalidLayoutError';
 import InvalidOrNotSentParamsError from './errors/InvalidOrNotSentParamsError';
 import UnknownError from './errors/UnknownError';
 import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
@@ -204,6 +205,41 @@ export default class Api {
                     sdkError = error;
                 } else {
                     sdkError = this.verifyAuthenticationError(error);
+                }
+
+                return Promise.reject(sdkError || new UnknownError());
+            });
+    }
+
+    /**
+     * Delete a theme from store
+     * @param id Theme id to delete
+     * @returns Promise Return true with promises resolve, or ApiError otherwise.
+     */
+    deleteTheme(id: number): Promise<boolean | ApiError> {
+        const config: AxiosRequestConfig = {
+            url: `${this.url}/themes/${id}`,
+            method: 'delete',
+            headers: this.headers,
+            params: {
+                gem_version: this.version,
+            },
+        };
+
+        return axios
+            .request(config)
+            .then((response) => {
+                return Promise.resolve(true);
+            })
+            .catch((error: AxiosError): Promise<boolean | ApiError> => {
+                let sdkError = this.verifyAuthenticationError(error);
+
+                if (!sdkError && error.response && error.response.data.message) {
+                    if (error.response.data.message.includes("undefined method `id'")) {
+                        return Promise.resolve(true);
+                    } else if (error.response.data.code == '00301') {
+                        sdkError = new InvalidLayoutError(error.response.data);
+                    }
                 }
 
                 return Promise.reject(sdkError || new UnknownError());
