@@ -9,6 +9,8 @@ import UnknownError from './errors/UnknownError';
 import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
 import { ApiCreateThemeResponse } from './responses/ApiCreateThemeResponse';
 import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
+import { ApiThemeAssetsResponse, ThemeAsset } from './responses/ApiThemeAssetsResponse';
+import keysToCamel from './utils/KeysToCamel';
 
 type config = {
     key: string;
@@ -242,6 +244,35 @@ export default class Api {
                     }
                 }
 
+                return Promise.reject(sdkError || new UnknownError());
+            });
+    }
+
+    /**
+     * Get theme assets
+     * @returns Object Return objects with assets and total quantity if promise resolves, or ApiError otherwise.
+     */
+    getThemeAssets(): Promise<ApiThemeAssetsResponse | ApiError> {
+        const config: AxiosRequestConfig = {
+            url: `${this.url}/themes/${this.themeId}/assets`,
+            method: 'get',
+            headers: this.headers,
+            params: {
+                gem_version: this.version,
+            },
+        };
+
+        return axios
+            .request(config)
+            .then((response) => {
+                const assets: ThemeAsset[] = keysToCamel(response.data.assets);
+                const quantity: number = response.data.meta.total;
+                const data: ApiThemeAssetsResponse = { assets, quantity };
+
+                return Promise.resolve(data);
+            })
+            .catch((error: AxiosError) => {
+                let sdkError = this.verifyAuthenticationError(error);
                 return Promise.reject(sdkError || new UnknownError());
             });
     }
