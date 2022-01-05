@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
+import { fromBuffer } from 'file-type';
 
 import ApiError from './errors/ApiError';
 import AuthenticationError from './errors/AuthenticationError';
@@ -9,6 +10,7 @@ import UnknownError from './errors/UnknownError';
 import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
 import { ApiCreateThemeResponse } from './responses/ApiCreateThemeResponse';
 import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
+import { ApiThemeAssetContentResponse } from './responses/ApiThemeAssetContentResponse';
 import { ApiThemeAssetsResponse, ThemeAsset } from './responses/ApiThemeAssetsResponse';
 import keysToCamel from './utils/KeysToCamel';
 
@@ -250,7 +252,7 @@ export default class Api {
 
     /**
      * Get theme assets
-     * @returns Object Return objects with assets and total quantity if promise resolves, or ApiError otherwise.
+     * @returns Promise Return assets and total quantity if promise resolves, or ApiError otherwise.
      */
     getThemeAssets(): Promise<ApiThemeAssetsResponse | ApiError> {
         const config: AxiosRequestConfig = {
@@ -270,6 +272,46 @@ export default class Api {
                 const data: ApiThemeAssetsResponse = { assets, quantity };
 
                 return Promise.resolve(data);
+            })
+            .catch((error: AxiosError) => {
+                let sdkError = this.verifyAuthenticationError(error);
+                return Promise.reject(sdkError || new UnknownError());
+            });
+    }
+
+    /**
+     * Get specific theme asset
+     * @returns Promise Return asset data if promise resolves, or ApiError otherwise.
+     */
+    getThemeAsset(asset: string): Promise<ApiThemeAssetContentResponse | ApiError> {
+        const config: AxiosRequestConfig = {
+            url: `${this.url}/themes/${this.themeId}/assets`,
+            method: 'get',
+            headers: this.headers,
+            params: {
+                key: asset,
+                gem_version: this.version,
+            },
+        };
+
+        return axios
+            .request(config)
+            .then((response) => {
+                const responseData = keysToCamel(response.data);
+                const assetContentBuffer = Buffer.from(responseData.content, 'base64');
+
+                return fromBuffer(assetContentBuffer).then((fileType) => {
+                    const { key, dynamic, publicUrl } = responseData;
+                    const data: ApiThemeAssetContentResponse = {
+                        key,
+                        dynamic: Boolean(dynamic),
+                        binary: !!fileType,
+                        content: assetContentBuffer,
+                        publicUrl,
+                    };
+
+                    return Promise.resolve(data);
+                });
             })
             .catch((error: AxiosError) => {
                 let sdkError = this.verifyAuthenticationError(error);
