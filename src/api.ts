@@ -320,7 +320,7 @@ export default class Api {
      * @param {string} asset Asset name like path
      * @param {Buffer} data Asset content
      * @param {boolean} isBinary True if content is binary, false otherwise.
-     * @return Promise
+     * @return Promise Return true if promise resolves, or ApiError otherwise.
      */
     sendThemeAsset({ asset, data, isBinary = false }: SendAsset): Promise<any> {
         const config: AxiosRequestConfig = {
