@@ -6,6 +6,7 @@ import AuthenticationError from './errors/AuthenticationError';
 import FailedConfigurationError from './errors/FailedConfigurationError';
 import InvalidLayoutError from './errors/InvalidLayoutError';
 import InvalidOrNotSentParamsError from './errors/InvalidOrNotSentParamsError';
+import ResourceNotFoundError from './errors/ResourceNotFoundError';
 import UnknownError from './errors/UnknownError';
 import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
 import { ApiCreateThemeResponse } from './responses/ApiCreateThemeResponse';
@@ -346,6 +347,44 @@ export default class Api {
 
                 if (!sdkError && error.response && error.response.data.code == '00101') {
                     sdkError = new InvalidOrNotSentParamsError(error.response.data);
+                }
+
+                return Promise.reject(sdkError || new UnknownError());
+            });
+    }
+
+    /**
+     * Delete asset requested
+     * @param {string} asset Asset name to be deleted.
+     * @return Promise Return true if promise resolves, or ApiError otherwise.
+     */
+    deleteThemeAsset(asset: string): Promise<boolean | ApiError> {
+        const config: AxiosRequestConfig = {
+            url: `${this.url}/themes/${this.themeId}/assets`,
+            method: 'delete',
+            headers: this.headers,
+            params: {
+                key: asset,
+                gem_version: this.version,
+            },
+        };
+
+        return axios
+            .request(config)
+            .then((response) => {
+                return Promise.resolve(true);
+            })
+            .catch((error: AxiosError): Promise<boolean | ApiError> => {
+                let sdkError = this.verifyAuthenticationError(error);
+
+                if (!sdkError && error.response && error.response.data.message) {
+                    if (error.response.data.message.includes("undefined local variable or method `upfile_updated'")) {
+                        return Promise.resolve(true);
+                    } else if (error.response.data.code == '00101') {
+                        sdkError = new InvalidOrNotSentParamsError(error.response.data);
+                    } else if (error.response.data.code == '00102') {
+                        sdkError = new ResourceNotFoundError(error.response.data);
+                    }
                 }
 
                 return Promise.reject(sdkError || new UnknownError());
