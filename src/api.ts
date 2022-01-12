@@ -40,6 +40,7 @@ export default class Api {
         this.headers = {
             Authorization: `Token token=${this.key}_${this.password}`,
             Accept: 'application/json',
+            'User-Agent': 'opencode_sdk@v0.0.1',
         };
     }
 
