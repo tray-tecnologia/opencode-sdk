@@ -12,14 +12,9 @@ import { ApiCreateThemeResponse } from './responses/ApiCreateThemeResponse';
 import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
 import { ApiThemeAssetContentResponse } from './responses/ApiThemeAssetContentResponse';
 import { ApiThemeAssetsResponse, ThemeAsset } from './responses/ApiThemeAssetsResponse';
+import { Config } from './types/Config';
+import { SendAsset } from './types/SendAsset';
 import keysToCamel from './utils/KeysToCamel';
-
-type config = {
-    key: string;
-    password: string;
-    themeId: number | null;
-    debug?: boolean;
-};
 
 /**
  * Opencode api main class
@@ -36,7 +31,7 @@ export default class Api {
     /**
      * Initiate API class instance
      */
-    constructor({ key, password, themeId = null, debug = false }: config) {
+    constructor({ key, password, themeId = null, debug = false }: Config) {
         this.key = key;
         this.password = password;
         this.themeId = themeId;
@@ -315,6 +310,44 @@ export default class Api {
             })
             .catch((error: AxiosError) => {
                 let sdkError = this.verifyAuthenticationError(error);
+                return Promise.reject(sdkError || new UnknownError());
+            });
+    }
+
+    /**
+     * Send an asset to theme
+     * @param {string} asset Asset name like path
+     * @param {Buffer} data Asset content
+     * @param {boolean} isBinary True if content is binary, false otherwise.
+     * @return Promise
+     */
+    sendThemeAsset({ asset, data, isBinary = false }: SendAsset): Promise<any> {
+        const config: AxiosRequestConfig = {
+            url: `${this.url}/themes/${this.themeId}/assets`,
+            method: 'put',
+            headers: this.headers,
+            data: {
+                gem_version: this.version,
+                key: asset,
+            },
+        };
+
+        config.data[isBinary ? 'attachment' : 'value'] = data.toString('base64');
+
+        return axios
+            .request(config)
+            .then((response) => {
+                return Promise.resolve(true);
+            })
+            .catch((error: AxiosError) => {
+                let sdkError;
+
+                sdkError = this.verifyAuthenticationError(error);
+
+                if (!sdkError && error.response && error.response.data.code == '00101') {
+                    sdkError = new InvalidOrNotSentParamsError(error.response.data);
+                }
+
                 return Promise.reject(sdkError || new UnknownError());
             });
     }
