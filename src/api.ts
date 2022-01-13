@@ -1,5 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import { fromBuffer } from 'file-type';
+import { promises as fsp } from 'fs';
+import { EOL } from 'os';
 
 import ApiError from './errors/ApiError';
 import AuthenticationError from './errors/AuthenticationError';
@@ -14,13 +16,17 @@ import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
 import { ApiThemeAssetContentResponse } from './responses/ApiThemeAssetContentResponse';
 import { ApiThemeAssetsResponse, ThemeAsset } from './responses/ApiThemeAssetsResponse';
 import { Config } from './types/Config';
+import { Debug } from './types/Debug';
 import { SendAsset } from './types/SendAsset';
 import keysToCamel from './utils/KeysToCamel';
+
+const { appendFile } = fsp;
 
 /**
  * Opencode api main class
  */
 export default class Api {
+    readonly debugFilePath: string = './.debug.log';
     readonly version: string = '1.0.4';
     readonly url: string = 'https://opencode.tray.com.br/api';
     readonly debug: boolean;
@@ -62,6 +68,23 @@ export default class Api {
     }
 
     /**
+     * Adds operation info log to file with debug enabled
+     * @param {string} type Type of message. Allowed: Emergency, Alert, Critical, Error, Warning, Notice Info or Debug
+     * @param {string} operation Operation where debug info was generated
+     * @param {Object|string} data Data from operation
+     * @private
+     */
+    private generateDebugFile({ type, operation, data }: Debug) {
+        if (this.debug) {
+            const date = new Date().toLocaleString('pt-br');
+            const convertedData = typeof data === 'object' && data !== null ? JSON.stringify(data) : data;
+            const dataToWrite = `[${date}] Type: ${type} | Operation: ${operation} | Data: ${convertedData}${EOL}`;
+
+            appendFile(this.debugFilePath, dataToWrite).catch((error) => false);
+        }
+    }
+
+    /**
      * Check configurations files
      * @returns Promise to be resolved. ApiConfigurationResponse if resolved. ApiError otherwise.
      */
@@ -85,6 +108,7 @@ export default class Api {
                 const { authentication, theme_id: themeId = null, preview = null } = response.data;
                 const data: ApiConfigurationResponse = { authentication, themeId, preview };
 
+                this.generateDebugFile({ type: 'Info', operation: 'checkConfiguration', data: response.data });
                 return Promise.resolve(data);
             })
             .catch((error: AxiosError) => {
@@ -98,6 +122,7 @@ export default class Api {
                     }
                 }
 
+                this.generateDebugFile({ type: 'Error', operation: 'checkConfiguration', data: error });
                 return Promise.reject(sdkError || new UnknownError());
             });
     }
@@ -119,12 +144,13 @@ export default class Api {
         return axios
             .request<ApiListThemesResponse>(config)
             .then((response) => {
+                this.generateDebugFile({ type: 'Info', operation: 'getThemes', data: response.data });
                 return Promise.resolve(response.data);
             })
             .catch((error: AxiosError) => {
-                let sdkError;
+                let sdkError = this.verifyAuthenticationError(error);
 
-                sdkError = this.verifyAuthenticationError(error);
+                this.generateDebugFile({ type: 'Error', operation: 'getThemes', data: error });
 
                 return Promise.reject(sdkError || new UnknownError());
             });
@@ -159,16 +185,17 @@ export default class Api {
                 const { theme_id: themeId, name, preview, published } = response.data;
                 const data: ApiCreateThemeResponse = { themeId, name, preview, published };
 
+                this.generateDebugFile({ type: 'Info', operation: 'createTheme', data: response.data });
                 return Promise.resolve(data);
             })
             .catch((error: AxiosError) => {
-                let sdkError;
-
-                sdkError = this.verifyAuthenticationError(error);
+                let sdkError = this.verifyAuthenticationError(error);
 
                 if (!sdkError && error.response && error.response.data.code == '00101') {
                     sdkError = new InvalidOrNotSentParamsError(error.response.data);
                 }
+
+                this.generateDebugFile({ type: 'Error', operation: 'createTheme', data: error });
 
                 return Promise.reject(sdkError || new UnknownError());
             });
@@ -193,10 +220,11 @@ export default class Api {
         return axios
             .request(config)
             .then((response) => {
-                if (response.data.response.code === 200) {
+                if (response.data.response.code !== 200) {
                     throw new UnknownError(`Unknown error. Details: ${response.data.response.message}`);
                 }
 
+                this.generateDebugFile({ type: 'Info', operation: 'cleanCache', data: response.data });
                 return Promise.resolve(true);
             })
             .catch((error: AxiosError | ApiError) => {
@@ -208,6 +236,7 @@ export default class Api {
                     sdkError = this.verifyAuthenticationError(error);
                 }
 
+                this.generateDebugFile({ type: 'Error', operation: 'cleanCache', data: error });
                 return Promise.reject(sdkError || new UnknownError());
             });
     }
@@ -230,6 +259,7 @@ export default class Api {
         return axios
             .request(config)
             .then((response) => {
+                this.generateDebugFile({ type: 'Info', operation: 'deleteTheme', data: response.data });
                 return Promise.resolve(true);
             })
             .catch((error: AxiosError): Promise<boolean | ApiError> => {
@@ -237,12 +267,14 @@ export default class Api {
 
                 if (!sdkError && error.response && error.response.data.message) {
                     if (error.response.data.message.includes("undefined method `id'")) {
+                        this.generateDebugFile({ type: 'Info', operation: 'deleteTheme', data: error.response.data });
                         return Promise.resolve(true);
                     } else if (error.response.data.code == '00301') {
                         sdkError = new InvalidLayoutError(error.response.data);
                     }
                 }
 
+                this.generateDebugFile({ type: 'Error', operation: 'deleteTheme', data: error });
                 return Promise.reject(sdkError || new UnknownError());
             });
     }
@@ -268,10 +300,13 @@ export default class Api {
                 const quantity: number = response.data.meta.total;
                 const data: ApiThemeAssetsResponse = { assets, quantity };
 
+                this.generateDebugFile({ type: 'Info', operation: 'getThemeAssets', data: response.data });
                 return Promise.resolve(data);
             })
             .catch((error: AxiosError) => {
                 let sdkError = this.verifyAuthenticationError(error);
+
+                this.generateDebugFile({ type: 'Error', operation: 'getThemeAssets', data: error });
                 return Promise.reject(sdkError || new UnknownError());
             });
     }
@@ -307,11 +342,14 @@ export default class Api {
                         publicUrl,
                     };
 
+                    this.generateDebugFile({ type: 'Info', operation: 'getThemeAsset', data: response.data });
                     return Promise.resolve(data);
                 });
             })
             .catch((error: AxiosError) => {
                 let sdkError = this.verifyAuthenticationError(error);
+
+                this.generateDebugFile({ type: 'Error', operation: 'getThemeAsset', data: error });
                 return Promise.reject(sdkError || new UnknownError());
             });
     }
@@ -339,6 +377,7 @@ export default class Api {
         return axios
             .request(config)
             .then((response) => {
+                this.generateDebugFile({ type: 'Info', operation: 'sendThemeAsset', data: response.data });
                 return Promise.resolve(true);
             })
             .catch((error: AxiosError) => {
@@ -350,6 +389,7 @@ export default class Api {
                     sdkError = new InvalidOrNotSentParamsError(error.response.data);
                 }
 
+                this.generateDebugFile({ type: 'Error', operation: 'sendThemeAsset', data: error });
                 return Promise.reject(sdkError || new UnknownError());
             });
     }
@@ -373,6 +413,7 @@ export default class Api {
         return axios
             .request(config)
             .then((response) => {
+                this.generateDebugFile({ type: 'Info', operation: 'deleteThemeAsset', data: response.data });
                 return Promise.resolve(true);
             })
             .catch((error: AxiosError): Promise<boolean | ApiError> => {
@@ -380,6 +421,11 @@ export default class Api {
 
                 if (!sdkError && error.response && error.response.data.message) {
                     if (error.response.data.message.includes("undefined local variable or method `upfile_updated'")) {
+                        this.generateDebugFile({
+                            type: 'Info',
+                            operation: 'deleteThemeAsset',
+                            data: error.response.data,
+                        });
                         return Promise.resolve(true);
                     } else if (error.response.data.code == '00101') {
                         sdkError = new InvalidOrNotSentParamsError(error.response.data);
@@ -388,6 +434,7 @@ export default class Api {
                     }
                 }
 
+                this.generateDebugFile({ type: 'Error', operation: 'deleteThemeAsset', data: error });
                 return Promise.reject(sdkError || new UnknownError());
             });
     }
