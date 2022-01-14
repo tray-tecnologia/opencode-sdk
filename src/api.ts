@@ -21,12 +21,13 @@ import { SendAsset } from './types/SendAsset';
 import keysToCamel from './utils/KeysToCamel';
 
 const { appendFile } = fsp;
+const pkg = require('../package.json');
 
 /**
  * Opencode api main class
  */
 export default class Api {
-    readonly debugFilePath: string = './.debug.log';
+    readonly debugFilePath: string = './.debug.sdk.log';
     readonly version: string = '1.0.4';
     readonly url: string = 'https://opencode.tray.com.br/api';
     readonly debug: boolean;
@@ -46,7 +47,7 @@ export default class Api {
         this.headers = {
             Authorization: `Token token=${this.key}_${this.password}`,
             Accept: 'application/json',
-            'User-Agent': 'opencode_sdk@v0.0.1',
+            'User-Agent': `${pkg.name}@${pkg.version}`,
         };
     }
 
