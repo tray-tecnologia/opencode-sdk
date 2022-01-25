@@ -1,6 +1,6 @@
 import { camelCase } from 'lodash';
 
-export default function keysToCamel(item: any): any {
+export function keysToCamel(item: any): any {
     if (item === Object(item) && !Array.isArray(item) && typeof item !== 'function') {
         const n = {};
 

@@ -3,13 +3,13 @@ import { fromBuffer } from 'file-type';
 import { promises as fsp } from 'fs';
 import { EOL } from 'os';
 
-import ApiError from './errors/ApiError';
-import AuthenticationError from './errors/AuthenticationError';
-import FailedConfigurationError from './errors/FailedConfigurationError';
-import InvalidLayoutError from './errors/InvalidLayoutError';
-import InvalidOrNotSentParamsError from './errors/InvalidOrNotSentParamsError';
-import ResourceNotFoundError from './errors/ResourceNotFoundError';
-import UnknownError from './errors/UnknownError';
+import { ApiError } from './errors/ApiError';
+import { AuthenticationError } from './errors/AuthenticationError';
+import { FailedConfigurationError } from './errors/FailedConfigurationError';
+import { InvalidLayoutError } from './errors/InvalidLayoutError';
+import { InvalidOrNotSentParamsError } from './errors/InvalidOrNotSentParamsError';
+import { ResourceNotFoundError } from './errors/ResourceNotFoundError';
+import { UnknownError } from './errors/UnknownError';
 import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
 import { ApiCreateThemeResponse } from './responses/ApiCreateThemeResponse';
 import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
@@ -18,7 +18,7 @@ import { ApiThemeAssetsResponse, ThemeAsset } from './responses/ApiThemeAssetsRe
 import { Config } from './types/Config';
 import { Debug } from './types/Debug';
 import { SendAsset } from './types/SendAsset';
-import keysToCamel from './utils/KeysToCamel';
+import { keysToCamel } from './utils/KeysToCamel';
 
 const { appendFile } = fsp;
 const pkg = require('../package.json');
@@ -26,7 +26,7 @@ const pkg = require('../package.json');
 /**
  * Opencode api main class
  */
-export default class Api {
+export class Api {
     readonly debugFilePath: string = './.debug.sdk.log';
     readonly version: string = '1.0.4';
     readonly url: string = 'https://opencode.tray.com.br/api';
@@ -89,7 +89,7 @@ export default class Api {
      * Check configurations files
      * @returns Promise to be resolved. ApiConfigurationResponse if resolved. ApiError otherwise.
      */
-    checkConfiguration(): Promise<ApiConfigurationResponse | ApiError> {
+    checkConfiguration(): Promise<ApiConfigurationResponse> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/check`,
             method: 'post',
@@ -132,7 +132,7 @@ export default class Api {
      * Get a list of all themes available at store
      * @returns Promise ApiListThemesResponse if promise resolves, or ApiError otherwise.
      */
-    getThemes(): Promise<ApiListThemesResponse | ApiError> {
+    getThemes(): Promise<ApiListThemesResponse> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/list`,
             method: 'get',

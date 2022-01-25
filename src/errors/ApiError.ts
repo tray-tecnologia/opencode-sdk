@@ -5,7 +5,7 @@ type ApiErrorParams = {
     data?: object;
 };
 
-export default class ApiError extends Error {
+export class ApiError extends Error {
     code: string;
     details?: string;
     data?: object;

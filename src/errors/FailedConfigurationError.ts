@@ -1,6 +1,6 @@
-import ApiError from './ApiError';
+import { ApiError } from './ApiError';
 
-export default class FailedConfigurationError extends ApiError {
+export class FailedConfigurationError extends ApiError {
     constructor(data: object) {
         super({
             code: 'SDK::0002',

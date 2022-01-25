@@ -1,6 +1,6 @@
-import ApiError from './ApiError';
+import { ApiError } from './ApiError';
 
-export default class ResourceNotFoundError extends ApiError {
+export class ResourceNotFoundError extends ApiError {
     constructor(data: object) {
         super({
             code: 'SDK::0005',

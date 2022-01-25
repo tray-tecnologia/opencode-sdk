@@ -1,6 +1,6 @@
-import ApiError from './ApiError';
+import { ApiError } from './ApiError';
 
-export default class UnknownError extends ApiError {
+export class UnknownError extends ApiError {
     constructor(message?: string) {
         super({
             code: 'SDK::9999',

@@ -1,6 +1,6 @@
-import ApiError from './ApiError';
+import { ApiError } from './ApiError';
 
-export default class InvalidOrNotSentParamsError extends ApiError {
+export class InvalidOrNotSentParamsError extends ApiError {
     constructor(data: object) {
         super({
             code: 'SDK::0003',
