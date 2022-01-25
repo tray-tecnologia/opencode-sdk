@@ -13,8 +13,8 @@
         "tray",
         "cli"
     ],
-    "main": "index.js",
-    "types": "dist/api.d.ts",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "files": [
         "index.js",
         "dist/**/*"
@@ -23,7 +23,8 @@
         "prepare": "husky install",
         "commit": "cz",
         "build": "tsc",
-        "watch": "tsc --watch"
+        "watch": "tsc --watch",
+        "prepublishOnly": ""
     },
     "devDependencies": {
         "@commitlint/cli": "^15.0.0",
@@ -34,15 +35,12 @@
         "@types/node": "^16.11.12",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
-        "axios": "^0.24.0",
         "commitizen": "^4.2.4",
         "eslint": "^8.4.1",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-import": "^2.25.3",
-        "file-type": "^16.5.3",
         "husky": "^7.0.4",
-        "lodash.camelcase": "^4.3.0",
         "prettier": "^2.5.1",
         "typescript": "^4.5.4"
     },
@@ -50,5 +48,10 @@
         "commitizen": {
             "path": "@commitlint/cz-commitlint"
         }
+    },
+    "dependencies": {
+        "axios": "^0.25.0",
+        "file-type": "^16.5.3",
+        "lodash.camelcase": "^4.3.0"
     }
 }
