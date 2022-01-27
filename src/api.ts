@@ -33,13 +33,13 @@ export class Api {
     readonly debug: boolean;
     readonly key: string;
     readonly password: string;
-    readonly themeId: number | null;
+    readonly themeId?: number;
     readonly headers: AxiosRequestHeaders;
 
     /**
      * Initiate API class instance
      */
-    constructor({ key, password, themeId = null, debug = false }: Config) {
+    constructor({ key, password, themeId, debug = false }: Config) {
         this.key = key;
         this.password = password;
         this.themeId = themeId;
@@ -207,7 +207,7 @@ export class Api {
      * @param {number|null} themeId Theme id to clean cache.
      * @returns Promise Return true with promises resolve, or ApiError otherwise.
      */
-    cleanCache(themeId = this.themeId): Promise<boolean | ApiError> {
+    cleanCache(themeId = this.themeId): Promise<boolean> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/clean_cache/`,
             method: 'post',
