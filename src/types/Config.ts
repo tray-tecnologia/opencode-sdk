@@ -1,6 +1,6 @@
 export type Config = {
     key: string;
     password: string;
-    themeId: number | null;
+    themeId?: number;
     debug?: boolean;
 };
