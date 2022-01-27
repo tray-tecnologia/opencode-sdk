@@ -163,7 +163,7 @@ export class Api {
      * @param base Name of the base theme
      * @returns Promise ApiCreateThemeResponse if promise resolves, or ApiError otherwise.
      */
-    createTheme(name: string, base: string = 'default'): Promise<ApiCreateThemeResponse | ApiError> {
+    createTheme(name: string, base: string = 'default'): Promise<ApiCreateThemeResponse> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes`,
             method: 'post',
@@ -284,7 +284,7 @@ export class Api {
      * Get theme assets
      * @returns Promise Return assets and total quantity if promise resolves, or ApiError otherwise.
      */
-    getThemeAssets(): Promise<ApiThemeAssetsResponse | ApiError> {
+    getThemeAssets(): Promise<ApiThemeAssetsResponse> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes/${this.themeId}/assets`,
             method: 'get',
@@ -316,7 +316,7 @@ export class Api {
      * Get specific theme asset
      * @returns Promise Return asset data if promise resolves, or ApiError otherwise.
      */
-    getThemeAsset(asset: string): Promise<ApiThemeAssetContentResponse | ApiError> {
+    getThemeAsset(asset: string): Promise<ApiThemeAssetContentResponse> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes/${this.themeId}/assets`,
             method: 'get',
@@ -362,7 +362,7 @@ export class Api {
      * @param {boolean} isBinary True if content is binary, false otherwise.
      * @return Promise Return true if promise resolves, or ApiError otherwise.
      */
-    sendThemeAsset({ asset, data, isBinary = false }: SendAsset): Promise<any> {
+    sendThemeAsset({ asset, data, isBinary = false }: SendAsset): Promise<boolean> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes/${this.themeId}/assets`,
             method: 'put',
