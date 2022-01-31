@@ -60,7 +60,7 @@ export class Api {
         if (error.response) {
             const { data } = error.response;
 
-            if (data.message == 'Token de acesso inválido' && data.code == '00001' && data.status == 401) {
+            if (data.message === 'Token de acesso inválido' && data.code === '00001' && data.status === 401) {
                 return new AuthenticationError(data.message, data);
             }
         }
@@ -81,7 +81,7 @@ export class Api {
             const convertedData = typeof data === 'object' && data !== null ? JSON.stringify(data) : data;
             const dataToWrite = `[${date}] Type: ${type} | Operation: ${operation} | Data: ${convertedData}${EOL}`;
 
-            appendFile(this.debugFilePath, dataToWrite).catch((error) => false);
+            appendFile(this.debugFilePath, dataToWrite).catch(() => false);
         }
     }
 
@@ -149,7 +149,7 @@ export class Api {
                 return Promise.resolve(response.data);
             })
             .catch((error: AxiosError) => {
-                let sdkError = this.verifyAuthenticationError(error);
+                const sdkError = this.verifyAuthenticationError(error);
 
                 this.generateDebugFile({ type: 'Error', operation: 'getThemes', data: error });
 
@@ -183,7 +183,7 @@ export class Api {
         return axios
             .request(config)
             .then((response) => {
-                const { theme_id: themeId, name, preview, published } = response.data;
+                const { theme_id: themeId, preview, published } = response.data;
                 const data: ApiCreateThemeResponse = { themeId, name, preview, published };
 
                 this.generateDebugFile({ type: 'Info', operation: 'createTheme', data: response.data });
@@ -192,7 +192,7 @@ export class Api {
             .catch((error: AxiosError) => {
                 let sdkError = this.verifyAuthenticationError(error);
 
-                if (!sdkError && error.response && error.response.data.code == '00101') {
+                if (!sdkError && error.response && error.response.data.code === '00101') {
                     sdkError = new InvalidOrNotSentParamsError(error.response.data);
                 }
 
@@ -247,7 +247,7 @@ export class Api {
      * @param id Theme id to delete
      * @returns Promise Return true with promises resolve, or ApiError otherwise.
      */
-    deleteTheme(id: number): Promise<boolean | ApiError> {
+    deleteTheme(id: number): Promise<boolean> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes/${id}`,
             method: 'delete',
@@ -263,14 +263,16 @@ export class Api {
                 this.generateDebugFile({ type: 'Info', operation: 'deleteTheme', data: response.data });
                 return Promise.resolve(true);
             })
-            .catch((error: AxiosError): Promise<boolean | ApiError> => {
+            .catch((error: AxiosError) => {
                 let sdkError = this.verifyAuthenticationError(error);
 
                 if (!sdkError && error.response && error.response.data.message) {
                     if (error.response.data.message.includes("undefined method `id'")) {
                         this.generateDebugFile({ type: 'Info', operation: 'deleteTheme', data: error.response.data });
                         return Promise.resolve(true);
-                    } else if (error.response.data.code == '00301') {
+                    }
+
+                    if (error.response.data.code === '00301') {
                         sdkError = new InvalidLayoutError(error.response.data);
                     }
                 }
@@ -305,7 +307,7 @@ export class Api {
                 return Promise.resolve(data);
             })
             .catch((error: AxiosError) => {
-                let sdkError = this.verifyAuthenticationError(error);
+                const sdkError = this.verifyAuthenticationError(error);
 
                 this.generateDebugFile({ type: 'Error', operation: 'getThemeAssets', data: error });
                 return Promise.reject(sdkError || new UnknownError());
@@ -348,7 +350,7 @@ export class Api {
                 });
             })
             .catch((error: AxiosError) => {
-                let sdkError = this.verifyAuthenticationError(error);
+                const sdkError = this.verifyAuthenticationError(error);
 
                 this.generateDebugFile({ type: 'Error', operation: 'getThemeAsset', data: error });
                 return Promise.reject(sdkError || new UnknownError());
@@ -386,7 +388,7 @@ export class Api {
 
                 sdkError = this.verifyAuthenticationError(error);
 
-                if (!sdkError && error.response && error.response.data.code == '00101') {
+                if (!sdkError && error.response && error.response.data.code === '00101') {
                     sdkError = new InvalidOrNotSentParamsError(error.response.data);
                 }
 
@@ -400,7 +402,7 @@ export class Api {
      * @param {string} asset Asset name to be deleted.
      * @return Promise Return true if promise resolves, or ApiError otherwise.
      */
-    deleteThemeAsset(asset: string): Promise<boolean | ApiError> {
+    deleteThemeAsset(asset: string): Promise<boolean> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes/${this.themeId}/assets`,
             method: 'delete',
@@ -417,7 +419,7 @@ export class Api {
                 this.generateDebugFile({ type: 'Info', operation: 'deleteThemeAsset', data: response.data });
                 return Promise.resolve(true);
             })
-            .catch((error: AxiosError): Promise<boolean | ApiError> => {
+            .catch((error: AxiosError) => {
                 let sdkError = this.verifyAuthenticationError(error);
 
                 if (!sdkError && error.response && error.response.data.message) {
@@ -428,9 +430,11 @@ export class Api {
                             data: error.response.data,
                         });
                         return Promise.resolve(true);
-                    } else if (error.response.data.code == '00101') {
+                    }
+
+                    if (error.response.data.code === '00101') {
                         sdkError = new InvalidOrNotSentParamsError(error.response.data);
-                    } else if (error.response.data.code == '00102') {
+                    } else if (error.response.data.code === '00102') {
                         sdkError = new ResourceNotFoundError(error.response.data);
                     }
                 }
