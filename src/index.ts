@@ -4,6 +4,8 @@ export * from './api';
 export * from './errors/ApiError';
 export * from './errors/AuthenticationError';
 export * from './errors/FailedConfigurationError';
+export * from './errors/FailedRemoveStaticFile';
+export * from './errors/FailedRemoveDynamicFile';
 export * from './errors/InvalidLayoutError';
 export * from './errors/InvalidOrNotSentParamsError';
 export * from './errors/ResourceNotFoundError';

@@ -6,6 +6,8 @@ import { EOL } from 'os';
 import { ApiError } from './errors/ApiError';
 import { AuthenticationError } from './errors/AuthenticationError';
 import { FailedConfigurationError } from './errors/FailedConfigurationError';
+import { FailedRemoveDynamicFile } from './errors/FailedRemoveDynamicFile';
+import { FailedRemoveStaticFile } from './errors/FailedRemoveStaticFile';
 import { InvalidLayoutError } from './errors/InvalidLayoutError';
 import { InvalidOrNotSentParamsError } from './errors/InvalidOrNotSentParamsError';
 import { ResourceNotFoundError } from './errors/ResourceNotFoundError';
@@ -436,6 +438,10 @@ export class Api {
                         sdkError = new InvalidOrNotSentParamsError(error.response.data);
                     } else if (error.response.data.code === '00102') {
                         sdkError = new ResourceNotFoundError(error.response.data);
+                    } else if (error.response.data.code === '00204') {
+                        sdkError = new FailedRemoveDynamicFile(error.response.data);
+                    } else if (error.response.data.code === '00205') {
+                        sdkError = new FailedRemoveStaticFile(error.response.data);
                     }
                 }
 
