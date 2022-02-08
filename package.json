@@ -1,12 +1,12 @@
 {
-    "name": "opencode-sdk",
-    "version": "0.0.1",
+    "name": "@tray-tecnologia/opencode-sdk",
+    "version": "1.0.0",
     "description": "Opencode SDK to interact with Opencode API",
     "license": "GPL-3.0-only",
-    "author": "rafael.andrade@netzee.com.br",
+    "author": "Tray Plataforma de E-commerce",
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@bitbucket.org/netzee-tray/opencode-sdk.git"
+        "url": "git+ssh://git@github.com:tray-tecnologia/opencode-sdk.git"
     },
     "keywords": [
         "opencode",
@@ -16,7 +16,6 @@
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "files": [
-        "index.js",
         "dist/**/*"
     ],
     "scripts": {
@@ -25,6 +24,11 @@
         "build": "tsc",
         "watch": "tsc --watch",
         "prepublishOnly": ""
+    },
+    "dependencies": {
+        "axios": "^0.25.0",
+        "file-type": "^16.5.3",
+        "lodash.camelcase": "^4.3.0"
     },
     "devDependencies": {
         "@commitlint/cli": "^15.0.0",
@@ -48,10 +52,5 @@
         "commitizen": {
             "path": "@commitlint/cz-commitlint"
         }
-    },
-    "dependencies": {
-        "axios": "^0.25.0",
-        "file-type": "^16.5.3",
-        "lodash.camelcase": "^4.3.0"
     }
 }
