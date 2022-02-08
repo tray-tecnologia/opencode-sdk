@@ -48,39 +48,39 @@ client
 
 Construtor da classe. Deve-se passar um objeto do tipo [Config](#config). Retorna uma instância de `Api`.
 
-#### .checkConfiguration(): Promise<ApiConfigurationResponse>
+#### .checkConfiguration(): Promise\<ApiConfigurationResponse\>
 
 Valida se os dados passados na criação do objeto estão corretos. Retorna objeto `ApiConfigurationResponse` se promise for resolvida ou uma instância de `ApiError` caso contrário.
 
-#### .cleanCache(themeId: number = this.themeId): Promise<boolean>
+#### .cleanCache(themeId: number = this.themeId): Promise\<boolean\>
 
 Limpa o cache do tema informado. Caso o parâmetro opcional `themeId` não seja informado, será usado o tema configurado. Retorna `true` se promise for resolvida, ou uma instância de `ApiError` caso contrário.
 
-#### .getThemes(): Promise<ApiListThemesResponse>
+#### .getThemes(): Promise\<ApiListThemesResponse\>
 
 Obtem a lista de todos os temas disponíveis na loja. Retorna objeto `ApiListThemesResponse` se promise for resolvida, ou uma instância de `ApiError` caso contrário.
 
-#### .createTheme(name: string, base: string = 'default'): Promise<ApiCreateThemeResponse>
+#### .createTheme(name: string, base: string = 'default'): Promise\<ApiCreateThemeResponse\>
 
 Cria um tema na loja. Deve ser informado o parâmetro obrigatório `name`, que será o nome do tema na loja. O parâmetro opcional `base` indica qual tema deve ser usado como base para criação desse novo tema. Caso não seja informado, será usado o tema padrão da plataforma. Retorna objeto `ApiCreateThemeResponse` se a promise for resolvida, ou uma instância de `ApiError` caso contrário.
 
-#### .deleteTheme(id: number): Promise<boolean>
+#### .deleteTheme(id: number): Promise\<boolean\>
 
 Remove o tema informado. Retorna `true` se a promise for resolvida, ou uma instância de `ApiError` caso contrário.
 
-#### .getAssets(): Promise<ApiAssetsResponse>
+#### .getAssets(): Promise\<ApiAssetsResponse\>
 
 Lista todos os arquivos do tema configurado. Retorna objeto `ApiAssetsResponse` se a promise for resolvida, ou uma instância de `ApiError` caso contrário.
 
-#### .getAsset(asset: string): Promise<ApiAssetContentResponse>
+#### .getAsset(asset: string): Promise\<ApiAssetContentResponse\>
 
 Obtem o conteúdo do arquivo solicitado. Retorna objeto `ApiAssetContentResponse` se a promise for resolvida, ou uma instância de `ApiError` caso contrário.
 
-#### .sendAsset({ asset, data, isBinary }: SendAsset): Promise<boolean>
+#### .sendAsset({ asset, data, isBinary }: SendAsset): Promise\<boolean\>
 
 Cria ou atualiza um arquivo no tema configurado. Deve-se passar um objeto do tipo [SendAsset](#sendasset). Retorna `true` se a promise for resolvida, ou uma instância de `ApiError` caso contrário.
 
-#### .deleteAsset(asset: string): Promise<boolean>
+#### .deleteAsset(asset: string): Promise\<boolean\>
 
 Remove um arquivo do tema informado. Deve ser informado o parâmetro `asset` contento o nome do arquivo a ser removido. **Atenção:** ele precisa iniciar com uma barra `/`. Retorna `true` se a promise for resolvida, ou uma instância de `ApiError` caso contrário.
 
