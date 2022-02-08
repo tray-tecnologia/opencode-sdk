@@ -12,11 +12,11 @@ import { InvalidLayoutError } from './errors/InvalidLayoutError';
 import { InvalidOrNotSentParamsError } from './errors/InvalidOrNotSentParamsError';
 import { ResourceNotFoundError } from './errors/ResourceNotFoundError';
 import { UnknownError } from './errors/UnknownError';
+import { ApiAssetContentResponse } from './responses/ApiAssetContentResponse';
+import { ApiAssetsResponse, ThemeAsset } from './responses/ApiAssetsResponse';
 import { ApiConfigurationResponse } from './responses/ApiConfigurationResponse';
 import { ApiCreateThemeResponse } from './responses/ApiCreateThemeResponse';
 import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
-import { ApiThemeAssetContentResponse } from './responses/ApiThemeAssetContentResponse';
-import { ApiThemeAssetsResponse, ThemeAsset } from './responses/ApiThemeAssetsResponse';
 import { Config } from './types/Config';
 import { Debug } from './types/Debug';
 import { SendAsset } from './types/SendAsset';
@@ -131,6 +131,46 @@ export class Api {
     }
 
     /**
+     * Clean cache for a theme on store
+     * @param {number|null} themeId Theme id to clean cache.
+     * @returns Promise Return true with promises resolve, or ApiError otherwise.
+     */
+    cleanCache(themeId = this.themeId): Promise<boolean> {
+        const config: AxiosRequestConfig = {
+            url: `${this.url}/clean_cache/`,
+            method: 'post',
+            headers: this.headers,
+            params: {
+                theme_id: themeId,
+                gem_version: this.version,
+            },
+        };
+
+        return axios
+            .request(config)
+            .then((response) => {
+                if (response.data.response.code !== 200) {
+                    throw new UnknownError(`Unknown error. Details: ${response.data.response.message}`);
+                }
+
+                this.generateDebugFile({ type: 'Info', operation: 'cleanCache', data: response.data });
+                return Promise.resolve(true);
+            })
+            .catch((error: AxiosError | ApiError) => {
+                let sdkError;
+
+                if (error instanceof ApiError) {
+                    sdkError = error;
+                } else {
+                    sdkError = this.verifyAuthenticationError(error);
+                }
+
+                this.generateDebugFile({ type: 'Error', operation: 'cleanCache', data: error });
+                return Promise.reject(sdkError || new UnknownError());
+            });
+    }
+
+    /**
      * Get a list of all themes available at store
      * @returns Promise ApiListThemesResponse if promise resolves, or ApiError otherwise.
      */
@@ -205,46 +245,6 @@ export class Api {
     }
 
     /**
-     * Clean cache for a theme on store
-     * @param {number|null} themeId Theme id to clean cache.
-     * @returns Promise Return true with promises resolve, or ApiError otherwise.
-     */
-    cleanCache(themeId = this.themeId): Promise<boolean> {
-        const config: AxiosRequestConfig = {
-            url: `${this.url}/clean_cache/`,
-            method: 'post',
-            headers: this.headers,
-            params: {
-                theme_id: themeId,
-                gem_version: this.version,
-            },
-        };
-
-        return axios
-            .request(config)
-            .then((response) => {
-                if (response.data.response.code !== 200) {
-                    throw new UnknownError(`Unknown error. Details: ${response.data.response.message}`);
-                }
-
-                this.generateDebugFile({ type: 'Info', operation: 'cleanCache', data: response.data });
-                return Promise.resolve(true);
-            })
-            .catch((error: AxiosError | ApiError) => {
-                let sdkError;
-
-                if (error instanceof ApiError) {
-                    sdkError = error;
-                } else {
-                    sdkError = this.verifyAuthenticationError(error);
-                }
-
-                this.generateDebugFile({ type: 'Error', operation: 'cleanCache', data: error });
-                return Promise.reject(sdkError || new UnknownError());
-            });
-    }
-
-    /**
      * Delete a theme from store
      * @param id Theme id to delete
      * @returns Promise Return true with promises resolve, or ApiError otherwise.
@@ -288,7 +288,7 @@ export class Api {
      * Get theme assets
      * @returns Promise Return assets and total quantity if promise resolves, or ApiError otherwise.
      */
-    getThemeAssets(): Promise<ApiThemeAssetsResponse> {
+    getAssets(): Promise<ApiAssetsResponse> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes/${this.themeId}/assets`,
             method: 'get',
@@ -303,7 +303,7 @@ export class Api {
             .then((response) => {
                 const assets: ThemeAsset[] = keysToCamel(response.data.assets);
                 const quantity: number = response.data.meta.total;
-                const data: ApiThemeAssetsResponse = { assets, quantity };
+                const data: ApiAssetsResponse = { assets, quantity };
 
                 this.generateDebugFile({ type: 'Info', operation: 'getThemeAssets', data: response.data });
                 return Promise.resolve(data);
@@ -320,7 +320,7 @@ export class Api {
      * Get specific theme asset
      * @returns Promise Return asset data if promise resolves, or ApiError otherwise.
      */
-    getThemeAsset(asset: string): Promise<ApiThemeAssetContentResponse> {
+    getAsset(asset: string): Promise<ApiAssetContentResponse> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes/${this.themeId}/assets`,
             method: 'get',
@@ -339,7 +339,7 @@ export class Api {
 
                 return fromBuffer(assetContentBuffer).then((fileType) => {
                     const { key, dynamic, publicUrl } = responseData;
-                    const data: ApiThemeAssetContentResponse = {
+                    const data: ApiAssetContentResponse = {
                         key,
                         dynamic: Boolean(dynamic),
                         binary: !!fileType,
@@ -366,7 +366,7 @@ export class Api {
      * @param {boolean} isBinary True if content is binary, false otherwise.
      * @return Promise Return true if promise resolves, or ApiError otherwise.
      */
-    sendThemeAsset({ asset, data, isBinary = false }: SendAsset): Promise<boolean> {
+    sendAsset({ asset, data, isBinary = false }: SendAsset): Promise<boolean> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes/${this.themeId}/assets`,
             method: 'put',
@@ -404,7 +404,7 @@ export class Api {
      * @param {string} asset Asset name to be deleted.
      * @return Promise Return true if promise resolves, or ApiError otherwise.
      */
-    deleteThemeAsset(asset: string): Promise<boolean> {
+    deleteAsset(asset: string): Promise<boolean> {
         const config: AxiosRequestConfig = {
             url: `${this.url}/themes/${this.themeId}/assets`,
             method: 'delete',

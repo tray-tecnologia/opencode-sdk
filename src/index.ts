@@ -14,8 +14,8 @@ export * from './errors/UnknownError';
 export * from './responses/ApiConfigurationResponse';
 export * from './responses/ApiCreateThemeResponse';
 export * from './responses/ApiListThemesResponse';
-export * from './responses/ApiThemeAssetsResponse';
-export * from './responses/ApiThemeAssetContentResponse';
+export * from './responses/ApiAssetsResponse';
+export * from './responses/ApiAssetContentResponse';
 
 export * from './types/Config';
 export * from './types/Debug';

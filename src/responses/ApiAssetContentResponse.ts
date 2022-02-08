@@ -1,4 +1,4 @@
-export type ApiThemeAssetContentResponse = {
+export type ApiAssetContentResponse = {
     key: string;
     dynamic: boolean;
     binary: boolean;

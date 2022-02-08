@@ -14,7 +14,7 @@ export type ThemeAsset = {
     errorMessage?: string;
 };
 
-export type ApiThemeAssetsResponse = {
+export type ApiAssetsResponse = {
     assets: ThemeAsset[];
     quantity: number;
 };
