@@ -37,7 +37,7 @@ Os temas precisam seguir uma estrutura bem determinada, caso contrário os arqui
 ├── pages
 ```
 
-Somente as pastas `css`, `img`, `elements` e `js` suportam subpastas. Tentar criar pastas nas outras pastas irá gerar o erro [SubfolderNotAllowedError](#).
+Somente as pastas `css`, `img`, `elements` e `js` suportam subpastas. Tentar criar pastas nas outras pastas irá gerar o erro [SubfolderNotAllowedError](#subfoldernotallowederror-sdk0010).
 
 Fique atento tambem aos formatos permitidos para os arquivos. Eles são: `.ttf`, `.otf`, `.eot`, `.woff`, `.woff2`, `.jpg`, `.jpeg`, `.gif`, `.png`, `.svg`, `.css`, `.scss`, `.html`, `.js`, `.json`
 
