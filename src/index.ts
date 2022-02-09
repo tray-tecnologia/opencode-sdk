@@ -22,4 +22,3 @@ export * from './types/Debug';
 export * from './types/SendAsset';
 
 export default Api;
-module.exports = Api;
