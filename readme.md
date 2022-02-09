@@ -5,10 +5,12 @@ Kit de desenvolvimento feito para interagir com as APIs do Opencode da Tray, fac
 ## Índice
 
 -   [Instalação](#instalação)
+-   [Estrutura dos temas](#estrutura-dos-temas)
 -   [Uso](#uso)
     -   [Métodos](#métodos)
     -   [Modo depuração](#modo-depuração)
     -   [Tipos](#tipos)
+-   [Erros](#erros)
 -   [Contribuições](#contribuições)
 -   [Licença](#licença)
 
@@ -20,6 +22,25 @@ Rode o comando abaixo para fazer a instalação desse pacote.
 npm install @tray-tecnologia/opencode-sdk
 ```
 
+## Estrutura dos temas
+
+Os temas precisam seguir uma estrutura bem determinada, caso contrário os arquivos não serão aceitos dentro da API. A estrutura a seguir ilustra as pastas obrigatórios dentro do tema.
+
+```
+├── configs
+├── css
+├── elements
+│   ├── snippets
+├── img
+├── js
+├── layouts
+├── pages
+```
+
+Somente as pastas `css`, `img`, `elements` e `js` suportam subpastas. Tentar criar pastas nas outras pastas irá gerar o erro [SubfolderNotAllowedError](#).
+
+Fique atento tambem aos formatos permitidos para os arquivos. Eles são: `.ttf`, `.otf`, `.eot`, `.woff`, `.woff2`, `.jpg`, `.jpeg`, `.gif`, `.png`, `.svg`, `.css`, `.scss`, `.html`, `.js`, `.json`
+
 ## Uso
 
 Todos os métodos disponíveis no SDK devolvem Promises. Ao serem resolvidas elas retornam os dados da API. Caso sejam rejeitadas possíveis erros podem ter acontecido.
@@ -27,7 +48,7 @@ Todos os métodos disponíveis no SDK devolvem Promises. Ao serem resolvidas ela
 Abaixo um exemplo simples de uso do SDK.
 
 ```js
-const Sdk = require('opencode-sdk');
+const Sdk = require('@tray-tecnologia/opencode-sdk').default;
 
 const client = new Sdk({
     key: 'YOUR-KEY-HERE',
@@ -116,6 +137,50 @@ type SendAsset = {
     isBinary: boolean;
 };
 ```
+
+## Erros
+
+O Opencode SDK pode retornar vários erros que indicam problemas diferentes durante a execução do programa. Verifique cada um deles abaixo.
+
+#### AuthenticationError (SDK::0001)
+
+Retornado caso os dados de acesso estejam incorretos.
+
+#### FailedConfigurationError (SDK::0002)
+
+Retornado quando não é possível verificar os dados de configuração especificados.
+
+#### InvalidOrNotSentParamsError (SDK::0003)
+
+Retornado quando um parâmetro obrigatório está inválido ou não foi enviado.
+
+#### InvalidLayoutError (SDK::0004)
+
+Retornado quando o id do tema não existe.
+
+#### ResourceNotFoundError (SDK::0005)
+
+Retornado quando o asset requisitado não existe no tema.
+
+#### FailedRemoveStaticFile (SDK::0006)
+
+Retornado quando não é possível remover um arquivo estatico do tema. Arquivos estáticos são quaisquer arquivos diferentes dos `.html` e que possuem código Twig.
+
+#### FailedRemoveDynamicFile (SDK::0007)
+
+Retornado quando não é possível remover um arquivo dinâmico do tema. Arquivos dinâmicos são arquivos `.html` que possuem código Twig.
+
+#### FileExtensionNotAllowedError (SDK::0008)
+
+Retornado ao tentar enviar um arquivo com extensão não suportada.
+
+#### FolderNotAllowedError (SDK::0009)
+
+Retornado ao tentar enviar um arquivo fora das pastas padrões permitidas.
+
+#### SubfolderNotAllowedError (SDK::0010)
+
+Retornado ao tentar criar subpastas em pastas não permitidas.
 
 ## Contribuições
 
