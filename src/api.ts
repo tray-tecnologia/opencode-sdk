@@ -20,6 +20,7 @@ import { ApiListThemesResponse } from './responses/ApiListThemesResponse';
 import { Config } from './types/Config';
 import { Debug } from './types/Debug';
 import { SendAsset } from './types/SendAsset';
+import { isFileAllowed } from './utils/IsFileAllowed';
 import { keysToCamel } from './utils/KeysToCamel';
 
 const { appendFile } = fsp;
@@ -379,24 +380,26 @@ export class Api {
 
         config.data[isBinary ? 'attachment' : 'value'] = data.toString('base64');
 
-        return axios
-            .request(config)
-            .then((response) => {
-                this.generateDebugFile({ type: 'Info', operation: 'sendThemeAsset', data: response.data });
-                return Promise.resolve(true);
-            })
-            .catch((error: AxiosError) => {
-                let sdkError;
+        return isFileAllowed(asset).then(() => {
+            return axios
+                .request(config)
+                .then((response) => {
+                    this.generateDebugFile({ type: 'Info', operation: 'sendThemeAsset', data: response.data });
+                    return Promise.resolve(true);
+                })
+                .catch((error: AxiosError) => {
+                    let sdkError;
 
-                sdkError = this.verifyAuthenticationError(error);
+                    sdkError = this.verifyAuthenticationError(error);
 
-                if (!sdkError && error.response && error.response.data.code === '00101') {
-                    sdkError = new InvalidOrNotSentParamsError(error.response.data);
-                }
+                    if (!sdkError && error.response && error.response.data.code === '00101') {
+                        sdkError = new InvalidOrNotSentParamsError(error.response.data);
+                    }
 
-                this.generateDebugFile({ type: 'Error', operation: 'sendThemeAsset', data: error });
-                return Promise.reject(sdkError || new UnknownError());
-            });
+                    this.generateDebugFile({ type: 'Error', operation: 'sendThemeAsset', data: error });
+                    return Promise.reject(sdkError || new UnknownError());
+                });
+        });
     }
 
     /**
