@@ -19,11 +19,11 @@
         "dist/**/*"
     ],
     "scripts": {
-        "prepare": "husky install",
+        "postinstall": "husky install",
         "commit": "cz",
         "build": "tsc",
         "watch": "tsc --watch",
-        "prepublishOnly": ""
+        "prepublishOnly": "npm run build"
     },
     "dependencies": {
         "axios": "^0.25.0",
