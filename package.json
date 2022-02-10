@@ -19,7 +19,7 @@
         "dist/**/*"
     ],
     "scripts": {
-        "postinstall": "husky install",
+        "prepare": "husky install",
         "commit": "cz",
         "build": "tsc",
         "watch": "tsc --watch",
