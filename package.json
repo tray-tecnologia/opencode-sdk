@@ -1,6 +1,6 @@
 {
     "name": "@tray-tecnologia/opencode-sdk",
-    "version": "1.0.0-beta",
+    "version": "1.0.0-beta-2",
     "description": "Opencode SDK to interact with Opencode API",
     "license": "GPL-3.0-only",
     "author": "Tray Plataforma de E-commerce",
