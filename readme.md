@@ -2,6 +2,9 @@
 
 Kit de desenvolvimento feito para interagir com as APIs do Opencode da Tray, facilitando as atualizações e suporte a novas versões. Criado utilizando NodeJs e Typescript.
 
+> [!WARNING] 
+> Você está visualizando uma versão legada. Utilize somente caso precisar acessar o Opencode antigo.
+
 ## Índice
 
 -   [Instalação](#instalação)
